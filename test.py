@@ -3,4 +3,4 @@ print("test code")
 
 print("test updates")
 
-print("test fetch again")
+print("test fetch and merge")
