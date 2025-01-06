@@ -1,13 +1,11 @@
-# code modifications based on the following implementations:
-# MasaCtrl: Tuning-Free Mutual Self-Attention Control for Consistent Image Synthesis and Editing
-# Prompt-to-Prompt Image Editing with Cross Attention Control
-
 import numpy as np
-from einops import rearrange, repeat
+from tqdm import tqdm
 from typing import Optional, Union, List
+from einops import rearrange
 
 import torch
 import torch.nn as nn
+from ..attention.attention import AttentionBase
 
 
 def latent2image(vae, latents):

@@ -1,8 +1,8 @@
-# code modifications based on the following implementations:
-# MasaCtrl: Tuning-Free Mutual Self-Attention Control for Consistent Image Synthesis and Editing
-# Prompt-to-Prompt Image Editing with Cross Attention Control
+import os
+import numpy as np
+from einops import rearrange
 
-from einops import rearrange, repeat
+import torch 
 import torch.nn as nn
 from torchvision.transforms import functional
 from torchvision.utils import save_image
@@ -45,7 +45,7 @@ class MutualSelfAttentionControl(AttentionBase):
         "SDXL": 70
     }
     
-    def __init__(self, start_step=4, start_layer=10, layer_idx=None, step_idx=None, total_steps=50, model_type="SD"):
+    def __init__(self, start_step=4, start_layer=10, layer_idx=None, step_idx=None, total_steps=50, model_type=""):
         """
         Mutual self-attention control for Stable-Diffusion model
         args:
@@ -60,6 +60,8 @@ class MutualSelfAttentionControl(AttentionBase):
         super().__init__()
         self.total_steps = total_steps
         self.total_layers = self.MODEL_TYPE.get(model_type, 16)
+        print(f"model type: {model_type},total_layers: {self.total_layers}")
+        
         self.start_step = start_step
         self.start_layer = start_layer
         
@@ -67,6 +69,7 @@ class MutualSelfAttentionControl(AttentionBase):
         self.step_idx = step_idx if step_idx is not None else list(range(start_step, total_steps))
         print("MFTF at denoising steps: ", self.step_idx)
         print("MFTF at U-Net layers: ", self.layer_idx)
+
 
     def attn_batch(self, q, k, v, sim, attn, is_cross, place_in_unet, num_heads, **kwargs):
         """
@@ -106,7 +109,7 @@ class MutualSelfAttentionControl(AttentionBase):
 
 
 class MFTF(MutualSelfAttentionControl):
-    def __init__(self, start_step=4, start_layer=10, layer_idx=None, step_idx=None, total_steps=50, thres=[0.1], ref_token_idx=[1], object_afflines=dict(), mask_save_dir=None, model_type="SD"):
+    def __init__(self, start_step=4, start_layer=10, layer_idx=None, step_idx=None, total_steps=50, thres=[0.1], ref_token_idx=[1], object_afflines=dict(), mask_save_dir=None, model_type=""):
         """
         MFTF with mask auto generation from cross-attention map
         args:

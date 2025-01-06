@@ -1,3 +1,5 @@
+import os
+import torch
 import collections 
 import matplotlib.pyplot as plt
 from textwrap import wrap
@@ -26,7 +28,7 @@ def prompts_idx(prompts,tokenizer):
     return prompts_ids
 
 
-def view_images(images,prompts,selected_prompts,object_afflines,fixed_width,fontsize=12,save_image_path):
+def view_images(images,prompts,selected_prompts,object_afflines,fixed_width,fontsize=12,save_image_path="."):
     def flatten_dict_to_string(d):
         return ", ".join(f"{key}:{value}" for key, value in d.items())
     
@@ -52,20 +54,3 @@ def view_images(images,prompts,selected_prompts,object_afflines,fixed_width,font
     plt.tight_layout()
     plt.savefig(save_image_path)
     return
-
-
-def lpips_metrics(images):
-    lpips = LearnedPerceptualImagePatchSimilarity(net_type='vgg')
-    eval_images=torch.tensor(images,dtype=torch.float).permute(0,3,1,2)
-    lpips_metrics=lpips(eval_images[[0]]*255*2-1, eval_images[[1]]*255*2-1)
-    return lpips_metrics
-
-
-def clip_metrics(images,prompts):
-    clip= CLIPScore(model_name_or_path="openai/clip-vit-base-patch16")
-    eval_images=torch.tensor(images).permute(0,3,1,2)
-    return clip(eval_images[0],prompts[0]), clip(eval_images[1],prompts[1])
-
-
-
-
